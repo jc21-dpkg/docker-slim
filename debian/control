@@ -1,0 +1,22 @@
+Source: docker-slim
+Section: util
+Priority: optional
+Maintainer: Jamie Curnow <jc@jc21.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 4.3.0.1
+Homepage: https://github.com/docker-slim/docker-slim
+Vcs-Git: https://github.com/docker-slim/docker-slim.git
+Vcs-Browser: https://github.com/docker-slim/docker-slim
+
+Package: docker-slim
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Description: Minify and Secure Docker containers!
+  Don't change anything in your Docker container image and minify it
+  by up to 30x making it secure too! Keep doing what you are doing.
+  No need to change anything. Use the base image you want. Use the
+  package manager you want. Don't worry about hand optimizing your
+  Dockerfile. You shouldn't have to throw away your tools and your
+  workflow to have small container images.

@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+
+SHELL=/bin/bash
+.SHELLFLAGS=-O extglob -O dotglob -c
+
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+
+export PACKAGE=$(shell cat ../dpkg.json | jq -r .PACKAGE)
+export GH_USER=$(shell cat ../dpkg.json | jq -r .GH_USER)
+export XC_ARCH=amd64
+export XC_OS=linux
+export GOOS=linux
+export CGO_ENABLED=0
+export GOPATH=$(shell pwd)
+
+%:
+	dh $@
+
+# dh_make generated override targets
+# This is example for Cmake (See https://bugs.debian.org/641051 )
+#override_dh_auto_configure:
+#	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+
+# Set go modules to on and use GoCenter for immutable modules
+build:
+	rm -rf Makefile
+	mkdir -p src/github.com/$${GH_USER}/$${PACKAGE}
+	mv !(src|debian) src/github.com/$${GH_USER}/$${PACKAGE}
+	export PATH=$${PATH}:$(GOPATH)/bin && \
+	    pushd src/github.com/$${GH_USER}/$${PACKAGE} && \
+		go build -a -installsuffix cgo -o $${GOPATH}/bin/$${PACKAGE} cmd/$${PACKAGE}/main.go && \
+		go build -a -installsuffix cgo -o $${GOPATH}/bin/$${PACKAGE}-sensor cmd/$${PACKAGE}-sensor/main.go && \
+		popd
